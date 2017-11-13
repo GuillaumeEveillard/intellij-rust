@@ -49,7 +49,9 @@ class ImplementMembersHandlerTest : RsTestBase() {
             impl T for S {}
         """)
         val presentation = myFixture.testAction(ActionManagerEx.getInstanceEx().getAction("ImplementMethods"))
-        check(!presentation.isEnabled)
+        ImplementMembersTestcrumbs.noImplInHandler.checkHit {
+            check(!presentation.isEnabled)
+        }
         check(myFixture.filterAvailableIntentions("Implement members").isEmpty())
     }
 

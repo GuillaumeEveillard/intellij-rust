@@ -12,14 +12,20 @@ import com.intellij.psi.PsiFile
 import org.rust.lang.core.psi.RsFile
 import org.rust.lang.core.psi.RsImplItem
 import org.rust.lang.core.psi.ext.parentOfType
+import org.rust.openapiext.Testcrumb
 
-class ImplementMembersHandler: LanguageCodeInsightActionHandler {
+class ImplementMembersHandler : LanguageCodeInsightActionHandler {
     override fun isValidFor(editor: Editor, file: PsiFile): Boolean {
         if (file !is RsFile) return false
 
         val elementAtCaret = file.findElementAt(editor.caretModel.offset)
         val classOrObject = elementAtCaret?.parentOfType<RsImplItem>(strict = false)
-        return classOrObject != null
+        return if (classOrObject == null) {
+            ImplementMembersTestcrumbs.noImplInHandler.hit()
+            false
+        } else {
+            true
+        }
     }
 
     override fun startInWriteAction() = false
@@ -30,4 +36,10 @@ class ImplementMembersHandler: LanguageCodeInsightActionHandler {
             ?: error("No impl trait item")
         generateTraitMembers(implItem, editor)
     }
+
 }
+
+object ImplementMembersTestcrumbs {
+    val noImplInHandler = Testcrumb("noImplInHandler")
+}
+
